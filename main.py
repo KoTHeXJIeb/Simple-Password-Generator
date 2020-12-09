@@ -1,6 +1,7 @@
 
 import PySimpleGUI as psg
 import time
+import pyperclip as pc
 
 try:
     psg.theme('DarkBlack')   
@@ -35,8 +36,10 @@ try:
             elif i == 'е':
                 passWord = passWord.replace(i, '3')
         psg.Popup(passWord)
+        psg.Popup('Successfully copied to clipboard!')
+        pc.copy(passWord)
     else:
-        psg.Popup('Password needs to be longer than 8 symbols!', keep_on_top=True)
+        psg.PopupError('Password needs to be longer than 8 symbols!', keep_on_top=True)
 
 except:
     time.sleep(3)
