@@ -45,7 +45,6 @@ def genPass(password):
 
 
 def main():
-    passWords = ['iLoveCats', 'programmingIsCool', 'informatika', '2brata3sestru']
     if event == "Generate Random Password":
         randpass = random.choice(passWords)
         randpass = randpass.lower()
