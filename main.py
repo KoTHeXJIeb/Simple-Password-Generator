@@ -35,6 +35,8 @@ def genPass(password):
                 password = password.replace(i, '1')
             elif i == 'е':
                 password = password.replace(i, '3')
+            elif i == "b":
+                password = password.replace(i, '6')
     psg.Popup(password)
     psg.Popup('Successfully copied to clipboard!')
     pc.copy(password)
@@ -54,5 +56,12 @@ def main():
         elif len(passWord) < 8:
             psg.PopupError('Password needs to be longer than 8 symbols!', keep_on_top=True)
 
+def saveAs():
+    try:
+        file = open('password.txt', 'w+')
+        file.write(password)
+        file.close()
+    except e:
+        psg.PopupError('Error was discovered while proccessing! Error: ' + e)
 
 main()
