@@ -3,16 +3,12 @@ import PySimpleGUI as psg
 import time
 import pyperclip as pc
 import random
-
-
-version = '0.1.0'
-
+import config
 
 psg.theme('DarkBlack')   
 
-
 layout = [  
-            [psg.Text('Current version of app is:'), psg.Text(version)],
+            [psg.Text('Current version of app is:'), psg.Text(config.version)],
             [psg.Text('Please enter here word, which according to something, you cannot forget:')],
             [psg.Text('', size=(15, 1)), psg.InputText()],
             [psg.Button('Generate Random Password')],
@@ -46,7 +42,7 @@ def genPass(password):
 
 def main():
     if event == "Generate Random Password":
-        randpass = random.choice(passWords)
+        randpass = random.choice(config.passWords)
         randpass = randpass.lower()
         genPass(password = randpass)
         window.close()
