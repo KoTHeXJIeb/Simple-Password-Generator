@@ -11,7 +11,7 @@ layout = [
             [psg.Text('Current version of app is:'), psg.Text(config.version)],
             [psg.Text('Please enter here word, which according to something, you cannot forget:')],
             [psg.Text('', size=(15, 1)), psg.InputText()],
-            [psg.Button('Generate Random Password')],
+            [psg.Submit('Generate Random Password')],
             [psg.Submit('Generate')]
         ]
 
@@ -37,17 +37,23 @@ def genPass(password):
                 password = password.replace(i, '3')
             elif i == "b":
                 password = password.replace(i, '6')
-    psg.Popup(password)
-    psg.Popup('Successfully copied to clipboard!')
+    # Here we need to show the popup, which asks you if u wanna to save a password
+    # as a file or just copy it
     pc.copy(password)
+
+
+def generateRandomPassword():
+    randpass = random.choice(config.passWords)
+    randpass = randpass.lower()
+    genPass(password = randpass)
+    psg.Popup('Password successfully generated and copied!')
+    pc.copy(password)
+    window.close()
 
 
 def main():
     if event == "Generate Random Password":
-        randpass = random.choice(config.passWords)
-        randpass = randpass.lower()
-        genPass(password = randpass)
-        window.close()
+        generateRandomPassword()
     elif event == 'Generate':
         passWord = values[0]
         passWord = passWord.lower()
@@ -55,6 +61,7 @@ def main():
             genPass(password = passWord)
         elif len(passWord) < 8:
             psg.PopupError('Password needs to be longer than 8 symbols!', keep_on_top=True)
+
 
 def saveAs():
     try:
