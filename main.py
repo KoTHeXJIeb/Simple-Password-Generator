@@ -1,70 +1,63 @@
 
+from hashlib import md5
 import PySimpleGUI as psg
-import time
 import pyperclip as pc
-import random
-from config import *
+import langdetect
+import transliterate
+import xlwt
+import hashlib
 
+import config
+import generate
 
-version = '0.1.1'
 themes = psg.theme_list()
 
-layout = [  
-            [psg.Text('Current version of app is:'), psg.Text(version)],
+layout = [
+            [psg.Text('Current version of app is:'), psg.Text(config.version)],
             [psg.Text('Please enter here word, which according to something, you cannot forget:')],
-            [psg.Text('', size=(15, 1)), psg.InputText()],
+            [psg.Text(size=(16, 1))],
+            [psg.InputText()],
             [psg.Button('Generate Random Password')],
             [psg.Submit('Generate')]
-        ]
+]
 
 window = psg.Window('Simple Password Generator - Create password you cannot forget!', size=(480, 240)).Layout(layout)
 event, values = window.read() 
 window.close() 
 
-psg.theme('DarkGrey11')
+psg.theme(config.theme_name)
 
-
-def generatePassword(password):
-    password = password.lower()
-    for i in password:
-        if i == ' ':
-            password = password.replace(i, '')
-        if i == 'i':
-            password = password.replace(i, '!')
-        elif i == 'o':
-            password = password.replace(i, '0')
-        elif i == 'e':
-            password = password.replace(i, '3')
-        elif i == 'і' or i == "l":
-            password = password.replace(i, '1')
-        elif i == 'a':
-            password = password.replace(i, '4')
-        elif i == 'g':
-            password = password.replace(i, '6')
-        elif i == 's':
-            password = password.replace(i, '5')
-    return password
+wb = xlwt.Workbook()
+sheet = wb.add_sheet('First Sheet')
 
 def main():
     if event == "Generate Random Password":
-        randpass = random.choice(passWords)
-        randpass = randpass.lower()
-        randpass = generatePassword(password = randpass)
-        psg.Popup(randpass)
-        psg.Popup('Successfully copied to clipboard!')
-        pc.copy(randpass)
-        window.close()
+        randpass = generate.generateRandomPassword()
+        psg.Popup('Password saved to a Excel file!')
+        sheet.write(1, 0, 'Password')
+        sheet.write(1, 1, randpass)
+        sheet.write(2, 0, 'Hash')
+        sheet.write(2, 1, 'MD5')
+        sheet.write(2, 2, hashlib.md5(randpass.encode(encoding = 'UTF-8', errors = 'strict')).hexdigest())
+        sheet.write(3, 1, 'SHA256')
+        sheet.write(3, 2, hashlib.sha256(randpass.encode(encoding = 'UTF-8', errors = 'strict')).hexdigest())
+        wb.save('password_generator.xls')
     elif event == 'Generate':
-        passWord = values[0]
-        passWord = passWord.lower()
+        passWord = values[0].lower()
+        if langdetect.detect(passWord) != 'en':
+            passWord = transliterate.translit(passWord, reversed=True)
         if len(passWord) >= 8:
-            finalPass = generatePassword(password = passWord)
-            psg.Popup(finalPass)
-            psg.Popup('Successfully copied to clipboard!')
-            pc.copy(finalPass)
-            window.close()
+            final = generate.generatePassword(password = passWord)
+            psg.Popup(final)
+            psg.Popup('Password saved to a Excel file!')
+            sheet.write(1, 0, 'Password')
+            sheet.write(1, 1, passWord)
+            sheet.write(2, 0, 'Hash')
+            sheet.write(2, 1, 'MD5')
+            sheet.write(2, 2, hashlib.md5(passWord.encode(encoding = 'UTF-8', errors = 'strict')).hexdigest())
+            sheet.write(3, 1, 'SHA256')
+            sheet.write(3, 2, hashlib.sha256(passWord.encode(encoding = 'UTF-8', errors = 'strict')).hexdigest())
+            wb.save('password_generator.xls')
         elif len(passWord) < 8:
-            psg.PopupError('Password needs to be longer than 8 symbols!', keep_on_top=True)
-
-
+            psg.PopupError('Password needs to be longer than 8 symbols!')
 main()
